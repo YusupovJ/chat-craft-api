@@ -9,11 +9,13 @@ export class AuthGuard implements CanActivate {
     const accessToken = request.headers.authorization?.split(" ")[1];
 
     if (!accessToken) {
-      throw new UnauthorizedException("you must be authorized");
+      throw new UnauthorizedException("Вы должны быть авторизованы");
     }
 
     const token = new Token();
-    token.verifyAccessToken(accessToken);
+    const payload = token.verifyAccessToken(accessToken);
+
+    request.userId = payload.userId;
 
     return true;
   }

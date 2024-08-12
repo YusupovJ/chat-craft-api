@@ -28,7 +28,7 @@ export class Token {
     try {
       return verify(accessToken, this.accessSecret) as IPayload;
     } catch (error) {
-      throw new UnauthorizedException("token is incorrect");
+      throw new UnauthorizedException("Неверный токен");
     }
   }
 
@@ -36,7 +36,7 @@ export class Token {
     try {
       return verify(refreshToken, this.refreshSecret) as IPayload;
     } catch (error) {
-      throw new UnauthorizedException("token is incorrect");
+      throw new UnauthorizedException("Неверный токен");
     }
   }
 }

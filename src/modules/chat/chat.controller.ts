@@ -1,13 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { CreateChatDto } from "./dto/create-chat.dto";
 import { UpdateChatDto } from "./dto/update-chat.dto";
 import { ApiResponse } from "src/helpers/apiResponse";
 import { PaginationDto } from "src/helpers/dto";
-// import { AuthGuard } from "src/helpers/authGuard";
 
 @Controller("chat")
-// @UseGuards(AuthGuard)
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
@@ -38,7 +36,6 @@ export class ChatController {
   @Delete(":id")
   async remove(@Param("id") id: string) {
     await this.chatService.remove(id);
-
     return new ApiResponse(`Чат ${id} удален`);
   }
 }
