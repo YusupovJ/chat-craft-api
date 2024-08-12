@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from "@nestjs/common";
 import { Observable } from "rxjs";
-import { Token } from "./token";
+import token from "./token";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -12,7 +12,6 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException("Вы должны быть авторизованы");
     }
 
-    const token = new Token();
     const payload = token.verifyAccessToken(accessToken);
 
     request.userId = payload.userId;

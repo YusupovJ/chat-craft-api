@@ -3,7 +3,7 @@ import { IPayload } from "./types";
 import { sign, verify } from "jsonwebtoken";
 import { UnauthorizedException } from "@nestjs/common";
 
-export class Token {
+class Token {
   private readonly accessSecret: string;
   private readonly refreshSecret: string;
   private readonly accessExpire: string;
@@ -40,3 +40,5 @@ export class Token {
     }
   }
 }
+
+export default new Token();
