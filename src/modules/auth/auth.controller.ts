@@ -20,7 +20,7 @@ export class AuthController {
     return this.authService.login(body);
   }
 
-  @Get()
+  @Get("me")
   @UseGuards(AuthGuard)
   async me(@Req() req: IRepuest) {
     return await this.authService.me(req.userId);
@@ -29,5 +29,11 @@ export class AuthController {
   @Post("/refresh")
   update(@Body() body: refreshDto) {
     return this.authService.refresh(body);
+  }
+
+  @Post("/logout")
+  @UseGuards(AuthGuard)
+  async logout(@Req() req: IRepuest) {
+    return await this.authService.logout(req.userId);
   }
 }

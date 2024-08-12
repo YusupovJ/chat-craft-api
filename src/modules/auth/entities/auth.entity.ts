@@ -9,7 +9,7 @@ export class Auth extends RootEntity {
   @Column("varchar")
   password: string;
 
-  @Column("varchar")
+  @Column("varchar", { nullable: true })
   token: string;
 
   @Column("integer")

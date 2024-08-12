@@ -1,8 +1,9 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateAuthDto {
   @IsNumber()
-  id: number
+  @IsOptional()
+  id: number;
 
   @IsString()
   username: string;
@@ -11,8 +12,10 @@ export class CreateAuthDto {
   password: string;
 
   @IsString()
+  @IsOptional()
   token: string;
 
   @IsNumber()
+  @IsOptional()
   avatar: number;
 }

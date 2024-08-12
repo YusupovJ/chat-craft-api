@@ -15,7 +15,7 @@ export class AuthService {
   async create(createAuthDto: CreateAuthDto) {
     const newUser = new Auth();
 
-    const user = await this.authService.find({ where: { username: createAuthDto.username } });
+    const user = await this.authService.findOne({ where: { username: createAuthDto.username } });
 
     if (user) {
       throw new BadRequestException("пользователь уже существует");
@@ -34,7 +34,7 @@ export class AuthService {
   }
 
   async login(body: CreateAuthDto) {
-    const user = await this.authService.findOne({ where: { id: body.id } });
+    const user = await this.authService.findOne({ where: { username: body.username } });
     if (!user) {
       throw new NotFoundException("пользователь не найден");
     }
@@ -57,9 +57,10 @@ export class AuthService {
   async me(id: number) {
     const user = await this.authService.findOne({ where: { id } });
     if (!user) {
-      throw new NotFoundException("пользователь не найден");
+      throw new UnauthorizedException("пользователь не найден");
     }
-    return new ApiResponse(user);
+    const users = { username: user.username, avatar: user.avatar };
+    return new ApiResponse(users);
   }
 
   async refresh(body: refreshDto) {
@@ -82,5 +83,15 @@ export class AuthService {
     await this.authService.save(user);
 
     return new ApiResponse({ accessToken, refreshToken });
+  }
+
+  async logout(id: number) {
+    const user = await this.authService.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException("пользователь не найден");
+    }
+    user.token = null;
+    await this.authService.save(user);
+    return new ApiResponse("ты вышел из системы");
   }
 }
