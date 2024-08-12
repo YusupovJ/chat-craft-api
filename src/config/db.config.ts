@@ -1,6 +1,7 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { envConfig } from "./env.config";
 import { Auth } from "src/modules/auth/entities/auth.entity";
+import { Chat } from "src/modules/chat/entities/chat.entity";
 
 export const dbConfig: TypeOrmModuleOptions = {
   type: "mysql",
@@ -9,6 +10,6 @@ export const dbConfig: TypeOrmModuleOptions = {
   username: envConfig.database.user,
   password: envConfig.database.password,
   database: envConfig.database.name,
-  entities: [Auth],
+  entities: [Auth, Chat],
   synchronize: true,
 };
