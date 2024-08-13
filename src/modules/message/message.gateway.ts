@@ -23,7 +23,6 @@ export class MessageGateway {
   @SubscribeMessage("message")
   async handleMessage(client: ISocket, message: CreateMessageDto) {
     client.join(message.chatId);
-    client.emit("reply", message.content);
 
     const user = await this.authRepo.findOne({ where: { id: message.userId } });
     if (!user) throw new NotFoundException("пользователь не найден");
@@ -39,6 +38,10 @@ export class MessageGateway {
 
     await this.messageRepo.save(newMessage);
 
-    client.broadcast.to(chat.id).emit("reply", message.content);
+    this.server.to(chat.id).emit("reply", newMessage);
+  }
+
+  async join(client: ISocket, chatId: string) {
+    client.join(chatId);
   }
 }

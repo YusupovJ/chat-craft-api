@@ -15,3 +15,8 @@ export class SearchDto {
   @IsString()
   search: string;
 }
+
+export class GetMessagesDto extends PaginationDto {
+  @IsString()
+  chatId: string;
+}

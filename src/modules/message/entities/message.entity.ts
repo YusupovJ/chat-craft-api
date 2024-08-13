@@ -8,9 +8,9 @@ export class Message extends RootEntity {
   @Column("varchar")
   content: string;
 
-  @ManyToOne(() => Auth)
+  @ManyToOne(() => Auth, { onDelete: "CASCADE" })
   user: Auth;
 
-  @ManyToOne(() => Chat)
+  @ManyToOne(() => Chat, { onDelete: "CASCADE" })
   chat: Chat;
 }
