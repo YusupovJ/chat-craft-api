@@ -24,17 +24,22 @@ export class AuthService {
     newUser.username = createAuthDto.username;
     newUser.avatar = createAuthDto.avatar;
     newUser.password = hashSync(createAuthDto.password, 3);
-    const accessToken = token.generateAccessToken({ userId: createAuthDto.id });
-    const refreshToken = token.generateRefreshToken({ userId: createAuthDto.id });
-    newUser.token = hashSync(refreshToken, 3);
 
-    await this.authService.save(newUser);
+    const savedUser = await this.authService.save(newUser);
+
+    const accessToken = token.generateAccessToken({ userId: savedUser.id });
+    const refreshToken = token.generateRefreshToken({ userId: savedUser.id });
+
+    savedUser.token = hashSync(refreshToken, 3);
+
+    await this.authService.save(savedUser);
 
     return new ApiResponse({ accessToken, refreshToken });
   }
 
   async login(body: CreateAuthDto) {
     const user = await this.authService.findOne({ where: { username: body.username } });
+
     if (!user) {
       throw new NotFoundException("пользователь не найден");
     }
@@ -44,8 +49,8 @@ export class AuthService {
       throw new BadRequestException("неверный пароль");
     }
 
-    const accessToken = token.generateAccessToken({ userId: body.id });
-    const refreshToken = token.generateRefreshToken({ userId: body.id });
+    const accessToken = token.generateAccessToken({ userId: user.id });
+    const refreshToken = token.generateRefreshToken({ userId: user.id });
 
     user.token = hashSync(refreshToken, 3);
 
@@ -60,6 +65,7 @@ export class AuthService {
       throw new UnauthorizedException("пользователь не найден");
     }
     const users = { username: user.username, avatar: user.avatar };
+
     return new ApiResponse(users);
   }
 
