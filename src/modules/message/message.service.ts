@@ -29,8 +29,10 @@ export class MessageService {
       where: { chat: { id: chatId } },
       relations: ["user"],
       order: {
-        created_at: "ASC",
+        created_at: "DESC",
       },
+      skip: pagintion.offset,
+      take: pagintion.limit,
     });
 
     return { messages, pagintion };
