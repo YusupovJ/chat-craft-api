@@ -5,7 +5,7 @@ import { Column, Entity, ManyToOne } from "typeorm";
 
 @Entity()
 export class Message extends RootEntity {
-  @Column("varchar")
+  @Column("text")
   content: string;
 
   @ManyToOne(() => Auth, { onDelete: "CASCADE" })
