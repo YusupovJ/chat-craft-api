@@ -29,7 +29,7 @@ export class MessageService {
       where: { chat: { id: chatId } },
       relations: ["user"],
       order: {
-        created_at: "DESC",
+        id: "DESC",
       },
       skip: pagintion.offset,
       take: pagintion.limit,

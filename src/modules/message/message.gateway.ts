@@ -1,7 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { CreateMessageDto } from "./dto/create-message.dto";
-import { ISocket } from "src/helpers/types";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Auth } from "../auth/entities/auth.entity";
 import { Repository } from "typeorm";
@@ -20,10 +19,20 @@ export class MessageGateway {
     @InjectRepository(Message) private readonly messageRepo: Repository<Message>,
   ) {}
 
-  @SubscribeMessage("message")
-  async handleMessage(client: ISocket, message: CreateMessageDto) {
-    client.join(message.chatId);
+  @SubscribeMessage("joinRoom")
+  handleJoinRoom(client: Socket, payload: { chatId: string; userId: string }) {
+    const { chatId } = payload;
+    client.join(chatId);
+  }
 
+  @SubscribeMessage("leaveRoom")
+  handleLeaveRoom(client: Socket, payload: { chatId: string }) {
+    const { chatId } = payload;
+    client.leave(chatId);
+  }
+
+  @SubscribeMessage("message")
+  async handleMessage(client: Socket, message: CreateMessageDto) {
     const user = await this.authRepo.findOne({ where: { id: message.userId } });
     if (!user) throw new NotFoundException("пользователь не найден");
 
@@ -31,7 +40,6 @@ export class MessageGateway {
     if (!chat) throw new NotFoundException("чат не найден");
 
     const newMessage = new Message();
-
     newMessage.content = message.content;
     newMessage.user = user;
     newMessage.chat = chat;
@@ -39,9 +47,5 @@ export class MessageGateway {
     await this.messageRepo.save(newMessage);
 
     this.server.to(chat.id).emit("reply", newMessage);
-  }
-
-  async join(client: ISocket, chatId: string) {
-    client.join(chatId);
   }
 }

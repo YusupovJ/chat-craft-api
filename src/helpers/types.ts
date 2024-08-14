@@ -8,7 +8,3 @@ export interface IPayload {
 export interface IRepuest extends Request {
   userId: number;
 }
-
-export interface ISocket extends Socket {
-  userId: number;
-}
