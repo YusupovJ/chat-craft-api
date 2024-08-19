@@ -5,19 +5,37 @@ import { Message } from "./entities/message.entity";
 import { Repository } from "typeorm";
 import { Pagination } from "src/helpers/pagination";
 import { Chat } from "../chat/entities/chat.entity";
+import { Auth } from "../auth/entities/auth.entity";
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message) private readonly messageRepo: Repository<Message>,
     @InjectRepository(Chat) private readonly chatRepo: Repository<Chat>,
+    @InjectRepository(Auth) private readonly authRepo: Repository<Auth>,
   ) {}
 
-  async findAll({ chatId, limit, page }: GetMessagesDto) {
-    const chat = await this.chatRepo.findOne({ where: { id: chatId } });
+  async findAll({ chatId, limit, page }: GetMessagesDto, userId: number) {
+    const chat = await this.chatRepo.findOne({
+      where: { id: chatId },
+      relations: ["users"],
+    });
 
     if (!chat) {
       throw new NotFoundException("чат не найден");
+    }
+
+    const user = await this.authRepo.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException("пользователь не найден");
+    }
+
+    const isNewJoinedUser = chat.users.find((user) => user.id === userId);
+
+    if (isNewJoinedUser) {
+      chat.users.push(user);
+      await this.chatRepo.save(chat);
     }
 
     const totalItems = await this.messageRepo.count({
@@ -29,7 +47,7 @@ export class MessageService {
       where: { chat: { id: chatId } },
       relations: ["user"],
       order: {
-        id: "DESC",
+        id: "ASC",
       },
       skip: pagintion.offset,
       take: pagintion.limit,

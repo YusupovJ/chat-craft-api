@@ -1,5 +1,6 @@
 import { RootEntity } from "src/helpers/root.entity";
-import { Column, Entity } from "typeorm";
+import { Chat } from "src/modules/chat/entities/chat.entity";
+import { Column, Entity, ManyToMany } from "typeorm";
 
 @Entity()
 export class Auth extends RootEntity {
@@ -14,4 +15,7 @@ export class Auth extends RootEntity {
 
   @Column("integer")
   avatar: number;
+
+  @ManyToMany(() => Chat, (chat) => chat.users)
+  chats: Chat[];
 }

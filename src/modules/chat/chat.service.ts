@@ -4,33 +4,50 @@ import { UpdateChatDto } from "./dto/update-chat.dto";
 import { Chat } from "./entities/chat.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { PaginationDto } from "src/helpers/dto";
 import { Pagination } from "src/helpers/pagination";
 import { nanoid } from "nanoid";
+import { PaginationDto } from "src/helpers/dto";
+import { Auth } from "../auth/entities/auth.entity";
 
 @Injectable()
 export class ChatService {
-  constructor(@InjectRepository(Chat) private readonly chatRepo: Repository<Chat>) {}
+  constructor(
+    @InjectRepository(Chat) private readonly chatRepo: Repository<Chat>,
+    @InjectRepository(Auth) private readonly authRepo: Repository<Auth>,
+  ) {}
 
-  async create(createChatDto: CreateChatDto) {
+  async create(createChatDto: CreateChatDto, userId: number) {
     const { name } = createChatDto;
+
+    const user = await this.authRepo.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException("user not found");
+    }
+
     const newChat = new Chat();
 
     newChat.id = nanoid(16);
     newChat.name = name;
+    newChat.users = [user];
 
     const savedChat = await this.chatRepo.save(newChat);
 
     return savedChat;
   }
 
-  async findAll({ limit, page }: PaginationDto) {
+  async findAll({ limit, page }: PaginationDto, userId: number) {
     const totalItems = await this.chatRepo.count();
     const pagination = new Pagination(totalItems, page, limit);
 
     const chats = await this.chatRepo.find({
       skip: pagination.offset,
       take: pagination.limit,
+      loadRelationIds: {
+        relations: ["users"],
+      },
+      relations: ["messages.user"],
+      where: { users: [{ id: userId }] },
     });
 
     return { chats, pagination };

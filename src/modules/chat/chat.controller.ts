@@ -1,23 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Req } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { CreateChatDto } from "./dto/create-chat.dto";
 import { UpdateChatDto } from "./dto/update-chat.dto";
 import { ApiResponse } from "src/helpers/apiResponse";
 import { PaginationDto } from "src/helpers/dto";
+import { AuthGuard } from "src/helpers/authGuard";
+import { IRequest } from "src/helpers/types";
 
 @Controller("chat")
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Post()
-  async create(@Body() createChatDto: CreateChatDto) {
-    const savedChat = await this.chatService.create(createChatDto);
+  @UseGuards(AuthGuard)
+  async create(@Body() createChatDto: CreateChatDto, @Req() req: IRequest) {
+    const savedChat = await this.chatService.create(createChatDto, req.userId);
     return new ApiResponse(savedChat, 201);
   }
 
   @Get()
-  async findAll(@Query() query: PaginationDto) {
-    const { chats, pagination } = await this.chatService.findAll(query);
+  @UseGuards(AuthGuard)
+  async findAll(@Query() query: PaginationDto, @Req() req: IRequest) {
+    const { chats, pagination } = await this.chatService.findAll(query, req.userId);
     return new ApiResponse(chats, 200, pagination);
   }
 

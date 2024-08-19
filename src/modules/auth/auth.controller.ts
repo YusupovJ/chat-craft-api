@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from "@nestjs/common";
+import { Controller, Get, Post, Body, UseGuards, Req } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateAuthDto } from "./dto/create-auth.dto";
-import { UpdateAuthDto } from "./dto/update-auth.dto";
 import { AuthGuard } from "src/helpers/authGuard";
-import { IRepuest } from "src/helpers/types";
+import { IRequest } from "src/helpers/types";
 import { refreshDto } from "./dto/refresh.dto";
 
 @Controller("auth")
@@ -22,7 +21,7 @@ export class AuthController {
 
   @Get("me")
   @UseGuards(AuthGuard)
-  async me(@Req() req: IRepuest) {
+  async me(@Req() req: IRequest) {
     return await this.authService.me(req.userId);
   }
 
@@ -33,7 +32,7 @@ export class AuthController {
 
   @Post("/logout")
   @UseGuards(AuthGuard)
-  async logout(@Req() req: IRepuest) {
+  async logout(@Req() req: IRequest) {
     return await this.authService.logout(req.userId);
   }
 }

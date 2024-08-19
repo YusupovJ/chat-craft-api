@@ -1,4 +1,15 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Auth } from "src/modules/auth/entities/auth.entity";
+import { Message } from "src/modules/message/entities/message.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 @Entity()
 export class Chat {
@@ -13,4 +24,11 @@ export class Chat {
 
   @Column("varchar")
   name: string;
+
+  @ManyToMany(() => Auth, (user) => user.chats)
+  @JoinTable()
+  users: Auth[];
+
+  @OneToMany(() => Message, (message) => message.chat)
+  messages: Message[];
 }
