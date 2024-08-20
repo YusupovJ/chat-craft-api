@@ -43,15 +43,18 @@ export class MessageService {
     });
     const pagintion = new Pagination(totalItems, page, limit);
 
-    const messages = await this.messageRepo.find({
-      where: { chat: { id: chatId } },
-      relations: ["user"],
-      order: {
-        id: "ASC",
-      },
-      skip: pagintion.offset,
-      take: pagintion.limit,
-    });
+    const messages = (
+      await this.messageRepo.find({
+        where: { chat: { id: chatId } },
+        relations: ["user"],
+        loadRelationIds: { relations: ["chat"] },
+        order: {
+          id: "DESC",
+        },
+        skip: pagintion.offset,
+        take: pagintion.limit,
+      })
+    ).reverse();
 
     return { messages, pagintion };
   }

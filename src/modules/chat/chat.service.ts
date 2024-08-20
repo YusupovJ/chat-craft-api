@@ -39,16 +39,19 @@ export class ChatService {
   async findAll({ limit, page }: PaginationDto, userId: number) {
     const totalItems = await this.chatRepo.count();
     const pagination = new Pagination(totalItems, page, limit);
-
-    const chats = await this.chatRepo.find({
-      skip: pagination.offset,
-      take: pagination.limit,
-      loadRelationIds: {
-        relations: ["users"],
-      },
-      relations: ["messages.user"],
-      where: { users: [{ id: userId }] },
-    });
+    const chats = await this.chatRepo
+      .createQueryBuilder("chat")
+      .leftJoinAndSelect("chat.users", "user")
+      .leftJoinAndSelect(
+        "chat.messages",
+        "message",
+        "message.id = (SELECT m.id FROM message m WHERE m.chatId = chat.id ORDER BY m.created_at DESC LIMIT 1)",
+      )
+      .leftJoinAndSelect("message.user", "users")
+      .where("user.id = :userId", { userId })
+      .skip(pagination.offset)
+      .take(pagination.limit)
+      .getMany();
 
     return { chats, pagination };
   }
