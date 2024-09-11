@@ -31,7 +31,7 @@ export class MessageService {
       throw new NotFoundException("пользователь не найден");
     }
 
-    const isNewJoinedUser = chat.users.find((user) => user.id === userId);
+    const isNewJoinedUser = !chat.users.find((user) => user.id === userId);
 
     if (isNewJoinedUser) {
       chat.users.push(user);
