@@ -24,6 +24,7 @@ export class AuthService {
     newUser.username = createAuthDto.username;
     newUser.avatar = createAuthDto.avatar;
     newUser.password = hashSync(createAuthDto.password, 3);
+    newUser.gender = createAuthDto.gender;
 
     const savedUser = await this.authService.save(newUser);
 
@@ -89,6 +90,19 @@ export class AuthService {
     await this.authService.save(user);
 
     return new ApiResponse({ accessToken, refreshToken });
+  }
+
+  async update(id: number, body: UpdateAuthDto) {
+    const user = await this.authService.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException("пользователь не найден");
+    }
+    user.avatar = body.avatar ?? user.avatar;
+    user.gender = body.gender ?? user.gender;
+    user.username = body.username ?? user.username;
+
+    await this.authService.save(user);
+    return new ApiResponse("ты обнавилса", 201);
   }
 
   async logout(id: number) {

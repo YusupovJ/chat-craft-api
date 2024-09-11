@@ -1,4 +1,5 @@
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
+import { EnumGender } from "../entities/auth.entity";
 
 export class CreateAuthDto {
   @IsNumber()
@@ -7,6 +8,10 @@ export class CreateAuthDto {
 
   @IsString()
   username: string;
+
+  @IsEnum(EnumGender)
+  @IsOptional()
+  gender: EnumGender;
 
   @IsString()
   password: string;
