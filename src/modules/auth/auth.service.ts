@@ -65,7 +65,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException("пользователь не найден");
     }
-    const users = { username: user.username, avatar: user.avatar, id: user.id };
+    const users = { username: user.username, avatar: user.avatar, id: user.id, gender: user.gender };
 
     return new ApiResponse(users);
   }
