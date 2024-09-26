@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { CreateMessageDto } from "./dto/create-message.dto";
+import { CreateMessageDto, CreateVoiceDto } from "./dto/create-message.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Auth } from "../auth/entities/auth.entity";
 import { Repository } from "typeorm";
@@ -41,11 +41,17 @@ export class MessageGateway {
 
     const newMessage = new Message();
     newMessage.content = message.content;
+    newMessage.type = message.type;
     newMessage.user = user;
     newMessage.chat = chat;
 
     await this.messageRepo.save(newMessage);
 
     this.server.to(chat.id).emit("reply", newMessage);
+  }
+
+  @SubscribeMessage("voice")
+  async handleVoice(client: Socket, message: CreateVoiceDto) {
+    console.log(message);
   }
 }

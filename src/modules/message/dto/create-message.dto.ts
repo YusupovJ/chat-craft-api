@@ -1,12 +1,24 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
+import { MessageTypeEnum } from "src/helpers/enums";
 
-export class CreateMessageDto {
-  @IsString()
-  content: string;
-
+class RootDto {
   @IsString()
   chatId: string;
 
   @IsNumber()
   userId: number;
+
+  @IsEnum(MessageTypeEnum)
+  @IsOptional()
+  type: MessageTypeEnum;
+}
+
+export class CreateMessageDto extends RootDto {
+  @IsString()
+  content: string;
+}
+
+export class CreateVoiceDto extends RootDto {
+  @IsString()
+  audioBlob: Blob;
 }

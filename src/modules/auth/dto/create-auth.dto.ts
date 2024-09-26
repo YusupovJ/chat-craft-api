@@ -1,11 +1,7 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
-import { EnumGender } from "../entities/auth.entity";
+import { EnumGender } from "src/helpers/enums";
 
 export class CreateAuthDto {
-  @IsNumber()
-  @IsOptional()
-  id: number;
-
   @IsString()
   username: string;
 
