@@ -4,27 +4,27 @@ import { UpdateAuthDto } from "./dto/update-auth.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Auth } from "./entities/auth.entity";
 import { Repository } from "typeorm";
-import { compare, compareSync, hashSync } from "bcrypt";
+import { compareSync, hashSync } from "bcrypt";
 import token from "src/helpers/token";
 import { ApiResponse } from "src/helpers/apiResponse";
 import { refreshDto } from "./dto/refresh.dto";
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(Auth) private readonly authService: Repository<CreateAuthDto>) {}
+  constructor(@InjectRepository(Auth) private readonly authService: Repository<Auth>) {}
   async create(createAuthDto: CreateAuthDto) {
     const newUser = new Auth();
 
     const user = await this.authService.findOne({ where: { username: createAuthDto.username } });
 
     if (user) {
-      throw new BadRequestException("пользователь уже существует");
+      throw new BadRequestException("Пользователь уже существует");
     }
 
     newUser.username = createAuthDto.username;
     newUser.avatar = createAuthDto.avatar;
-    newUser.password = hashSync(createAuthDto.password, 3);
     newUser.gender = createAuthDto.gender;
+    newUser.password = hashSync(createAuthDto.password, 3);
 
     const savedUser = await this.authService.save(newUser);
 
@@ -42,12 +42,12 @@ export class AuthService {
     const user = await this.authService.findOne({ where: { username: body.username } });
 
     if (!user) {
-      throw new NotFoundException("пользователь не найден");
+      throw new NotFoundException("Имя или пароль неверны");
     }
 
     const checkPassword = compareSync(body.password, user.password);
     if (!checkPassword) {
-      throw new BadRequestException("неверный пароль");
+      throw new BadRequestException("Имя или пароль неверны");
     }
 
     const accessToken = token.generateAccessToken({ userId: user.id });
@@ -63,7 +63,7 @@ export class AuthService {
   async me(id: number) {
     const user = await this.authService.findOne({ where: { id } });
     if (!user) {
-      throw new UnauthorizedException("пользователь не найден");
+      throw new UnauthorizedException("Пользователь не найден");
     }
     const users = { username: user.username, avatar: user.avatar, id: user.id, gender: user.gender };
 
@@ -75,12 +75,12 @@ export class AuthService {
 
     const user = await this.authService.findOne({ where: { id: userId } });
     if (!user) {
-      throw new NotFoundException("пользователь не найден");
+      throw new UnauthorizedException("Пользователь не найден");
     }
 
     const checkToken = compareSync(body.refreshToken, user.token);
     if (!checkToken) {
-      throw new UnauthorizedException("неверный Токен");
+      throw new UnauthorizedException("Неверный Токен");
     }
 
     const accessToken = token.generateAccessToken({ userId: user.id });
@@ -95,23 +95,23 @@ export class AuthService {
   async update(id: number, body: UpdateAuthDto) {
     const user = await this.authService.findOneBy({ id });
     if (!user) {
-      throw new NotFoundException("пользователь не найден");
+      throw new NotFoundException("Пользователь не найден");
     }
     user.avatar = body.avatar ?? user.avatar;
     user.gender = body.gender ?? user.gender;
     user.username = body.username ?? user.username;
 
     await this.authService.save(user);
-    return new ApiResponse("ты обнавилса", 201);
+    return new ApiResponse("Ты обнавилса", 201);
   }
 
   async logout(id: number) {
     const user = await this.authService.findOne({ where: { id } });
     if (!user) {
-      throw new NotFoundException("пользователь не найден");
+      throw new NotFoundException("Пользователь не найден");
     }
     user.token = null;
     await this.authService.save(user);
-    return new ApiResponse("ты вышел из системы");
+    return new ApiResponse("Ты вышел из системы");
   }
 }

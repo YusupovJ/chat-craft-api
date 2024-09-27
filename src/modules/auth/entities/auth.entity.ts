@@ -1,13 +1,7 @@
+import { EnumGender } from "src/helpers/enums";
 import { RootEntity } from "src/helpers/root.entity";
 import { Chat } from "src/modules/chat/entities/chat.entity";
 import { Column, Entity, ManyToMany } from "typeorm";
-
-export enum EnumGender {
-  man = "man",
-  girl = "girl",
-  steve = "steve",
-  croissant = "croissant",
-}
 
 @Entity()
 export class Auth extends RootEntity {
@@ -20,16 +14,16 @@ export class Auth extends RootEntity {
   @Column({
     type: "enum",
     enum: EnumGender,
-    default: "steve",
+    default: EnumGender.steve,
   })
   gender: EnumGender;
 
   @Column("varchar", { nullable: true })
   token: string;
 
-  @Column("integer")
+  @Column("integer", { default: 0 })
   avatar: number;
 
-  @ManyToMany(() => Chat, (chat) => chat.users)
+  @ManyToMany(() => Chat, (chat) => chat.users, { onDelete: "CASCADE" })
   chats: Chat[];
 }
