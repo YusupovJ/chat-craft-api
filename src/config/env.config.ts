@@ -4,6 +4,7 @@ config();
 
 export const envConfig = {
   port: process.env.PORT,
+  apiUrl: process.env.API_URL,
   database: {
     name: process.env.DB_NAME,
     user: process.env.DB_USER,

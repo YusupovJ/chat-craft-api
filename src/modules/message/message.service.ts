@@ -58,4 +58,14 @@ export class MessageService {
 
     return { messages, pagintion };
   }
+
+  async areExist(userId: number, chatId: string) {
+    const user = await this.authRepo.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException("пользователь не найден");
+
+    const chat = await this.chatRepo.findOne({ where: { id: chatId } });
+    if (!chat) throw new NotFoundException("чат не найден");
+
+    return { user, chat };
+  }
 }

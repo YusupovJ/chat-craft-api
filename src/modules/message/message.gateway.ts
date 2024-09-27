@@ -7,6 +7,10 @@ import { Repository } from "typeorm";
 import { NotFoundException } from "@nestjs/common";
 import { Chat } from "../chat/entities/chat.entity";
 import { Message } from "./entities/message.entity";
+import * as fs from "fs/promises";
+import * as path from "path";
+import { envConfig } from "src/config/env.config";
+import { MessageService } from "./message.service";
 
 @WebSocketGateway({ cors: { origin: "*" } })
 export class MessageGateway {
@@ -14,9 +18,8 @@ export class MessageGateway {
   server: Server;
 
   constructor(
-    @InjectRepository(Auth) private readonly authRepo: Repository<Auth>,
-    @InjectRepository(Chat) private readonly chatRepo: Repository<Chat>,
     @InjectRepository(Message) private readonly messageRepo: Repository<Message>,
+    private readonly messageService: MessageService,
   ) {}
 
   @SubscribeMessage("joinRoom")
@@ -33,11 +36,7 @@ export class MessageGateway {
 
   @SubscribeMessage("message")
   async handleMessage(client: Socket, message: CreateMessageDto) {
-    const user = await this.authRepo.findOne({ where: { id: message.userId } });
-    if (!user) throw new NotFoundException("пользователь не найден");
-
-    const chat = await this.chatRepo.findOne({ where: { id: message.chatId } });
-    if (!chat) throw new NotFoundException("чат не найден");
+    const { chat, user } = await this.messageService.areExist(message.userId, message.chatId);
 
     const newMessage = new Message();
     newMessage.content = message.content;
@@ -52,6 +51,23 @@ export class MessageGateway {
 
   @SubscribeMessage("voice")
   async handleVoice(client: Socket, message: CreateVoiceDto) {
-    console.log(message);
+    const { chat, user } = await this.messageService.areExist(message.userId, message.chatId);
+
+    const filename = `${message.chatId}-${message.userId}-${Date.now()}.webm`;
+    const filepath = path.resolve("uploads", filename);
+
+    await fs.writeFile(filepath, message.audioBlob);
+
+    const audioUrl = `${envConfig.apiUrl}/upload/${filename}`;
+
+    const newMessage = new Message();
+    newMessage.content = audioUrl;
+    newMessage.chat = chat;
+    newMessage.user = user;
+    newMessage.type = message.type;
+
+    await this.messageRepo.save(newMessage);
+
+    this.server.to(chat.id).emit("reply", newMessage);
   }
 }

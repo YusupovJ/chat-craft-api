@@ -1,3 +1,4 @@
+import { Blob } from "buffer";
 import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
 import { MessageTypeEnum } from "src/helpers/enums";
 
@@ -20,5 +21,5 @@ export class CreateMessageDto extends RootDto {
 
 export class CreateVoiceDto extends RootDto {
   @IsString()
-  audioBlob: Blob;
+  audioBlob: Buffer;
 }
