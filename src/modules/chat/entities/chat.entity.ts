@@ -25,6 +25,9 @@ export class Chat {
   @Column("varchar")
   name: string;
 
+  @Column("varchar")
+  img: string;
+
   @ManyToMany(() => Auth, (user) => user.chats)
   @JoinTable()
   users: Auth[];

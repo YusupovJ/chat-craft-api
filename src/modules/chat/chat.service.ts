@@ -30,6 +30,7 @@ export class ChatService {
     newChat.id = nanoid(16);
     newChat.name = name;
     newChat.users = [user];
+    newChat.img = createChatDto.img;
 
     const savedChat = await this.chatRepo.save(newChat);
 

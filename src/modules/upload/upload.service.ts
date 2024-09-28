@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { envConfig } from "src/config/env.config";
 
 @Injectable()
 export class UploadService {
@@ -8,6 +9,7 @@ export class UploadService {
       size: file.size,
       originalname: file.originalname,
       mimetype: file.mimetype,
+      url: `${envConfig.apiUrl}/upload/${file.filename}`,
     };
   }
 }
