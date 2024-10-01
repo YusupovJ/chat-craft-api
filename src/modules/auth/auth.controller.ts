@@ -5,8 +5,10 @@ import { AuthGuard } from "src/helpers/authGuard";
 import { IRequest } from "src/helpers/types";
 import { refreshDto } from "./dto/refresh.dto";
 import { UpdateAuthDto } from "./dto/update-auth.dto";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @Controller("auth")
+@ApiTags("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

@@ -6,8 +6,10 @@ import { ApiResponse } from "src/helpers/apiResponse";
 import { PaginationDto } from "src/helpers/dto";
 import { AuthGuard } from "src/helpers/authGuard";
 import { IRequest } from "src/helpers/types";
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller("chat")
+@ApiTags("chat")
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 

@@ -4,8 +4,10 @@ import { MessageService } from "./message.service";
 import { ApiResponse } from "src/helpers/apiResponse";
 import { AuthGuard } from "src/helpers/authGuard";
 import { IRequest } from "src/helpers/types";
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller("message")
+@ApiTags("message")
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 

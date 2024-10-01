@@ -4,8 +4,10 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { uploadOptions } from "src/config/multer.config";
 import { resolve } from "path";
 import { Response } from "express";
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller("upload")
+@ApiTags("upload")
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 

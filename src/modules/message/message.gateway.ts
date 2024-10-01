@@ -11,6 +11,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { envConfig } from "src/config/env.config";
 import { MessageService } from "./message.service";
+import { ApiTags } from "@nestjs/swagger";
 
 @WebSocketGateway({ cors: { origin: "*" } })
 export class MessageGateway {
