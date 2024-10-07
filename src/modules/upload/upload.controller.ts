@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Post, Res, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Param, Post, Res, UploadedFile, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { UploadService } from "./upload.service";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { uploadOptions } from "src/config/multer.config";
 import { resolve } from "path";
 import { Response } from "express";
@@ -15,6 +15,12 @@ export class UploadController {
   @UseInterceptors(FileInterceptor("file", uploadOptions))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return await this.uploadService.uploadFile(file);
+  }
+
+  @Post("/multiple")
+  @UseInterceptors(FilesInterceptor("files", 10, uploadOptions))
+  async uploadMultipleFiles(@UploadedFiles() files: Express.Multer.File[]) {
+    return await this.uploadService.uploadMultipleFiles(files);
   }
 
   @Get("/:name")

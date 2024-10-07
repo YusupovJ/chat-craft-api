@@ -12,4 +12,16 @@ export class UploadService {
       url: `${envConfig.apiUrl}/upload/${file.filename}`,
     };
   }
+
+  async uploadMultipleFiles(files: Express.Multer.File[]) {
+    const filenames = files.map((file) => ({
+      filename: file.filename,
+      size: file.size,
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      url: `${envConfig.apiUrl}/upload/${file.filename}`,
+    }));
+
+    return { filenames };
+  }
 }

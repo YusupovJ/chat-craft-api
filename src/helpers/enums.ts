@@ -9,4 +9,5 @@ export enum MessageTypeEnum {
   text = "text",
   voice = "voice",
   sticker = "sticker",
+  image = "image",
 }
