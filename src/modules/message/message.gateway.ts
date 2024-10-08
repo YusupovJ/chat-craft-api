@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { CreateMessageDto, CreateVoiceDto } from "./dto/create-message.dto";
+import { CreateImageDto, CreateMessageDto, CreateVoiceDto } from "./dto/create-message.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Auth } from "../auth/entities/auth.entity";
 import { Repository } from "typeorm";
@@ -63,6 +63,21 @@ export class MessageGateway {
 
     const newMessage = new Message();
     newMessage.content = audioUrl;
+    newMessage.chat = chat;
+    newMessage.user = user;
+    newMessage.type = message.type;
+
+    await this.messageRepo.save(newMessage);
+
+    this.server.to(chat.id).emit("reply", newMessage);
+  }
+
+  @SubscribeMessage("image")
+  async handleImage(client: Socket, message: CreateImageDto) {
+    const { chat, user } = await this.messageService.areExist(message.userId, message.chatId);
+
+    const newMessage = new Message();
+    newMessage.content = message.images.join(" ");
     newMessage.chat = chat;
     newMessage.user = user;
     newMessage.type = message.type;

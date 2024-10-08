@@ -23,3 +23,8 @@ export class CreateVoiceDto extends RootDto {
   @IsString()
   audioBlob: Buffer;
 }
+
+export class CreateImageDto extends RootDto {
+  @IsString()
+  images: string[];
+}
